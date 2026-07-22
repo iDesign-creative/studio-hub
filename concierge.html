@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concierge · iDesign Studio</title>
+<link rel="stylesheet" href="studio.css?v=2">
+<style>
+  .ctx{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;font-weight:700}
+  .ctx .sep{color:var(--line)}
+  .ctx b{color:var(--text)}
+
+  .stage{max-width:1120px;margin:0 auto;padding:22px 22px 30px;display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+  .thread{display:flex;flex-direction:column;gap:20px}
+
+  .msg{display:flex;gap:12px;align-items:flex-start}
+  .msg.me{flex-direction:row-reverse}
+  .av{width:38px;height:38px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center}
+  .av.agent{background:linear-gradient(135deg,#0E7FB0,#33C9FF)}
+  .av.agent svg{width:auto;height:26px}
+  .av.me{background:var(--green);color:#093312;font-weight:900;font-size:15px}
+
+  .bwrap{max-width:80%;display:flex;flex-direction:column}
+  .msg.me .bwrap{align-items:flex-end}
+  .who{font-size:10.5px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--primary);margin:1px 0 6px}
+  .bubble{padding:13px 16px;font-size:14.5px;line-height:1.55;border-radius:14px}
+  .bubble.agent{background:var(--surf);border:1px solid var(--line);border-top-left-radius:3px;color:var(--text)}
+  .bubble.me{background:rgba(51,201,255,.10);border:1px solid var(--ocean70);border-top-right-radius:3px;color:var(--text)}
+  .bubble b{color:#fff;font-weight:900}
+  .bubble ol{margin:10px 0 2px;padding-left:20px}
+  .bubble ol li{margin:5px 0}
+
+  .attach{display:inline-flex;align-items:center;gap:10px;margin-top:10px;background:rgba(0,20,29,.55);border:1px solid var(--line);border-radius:10px;padding:9px 13px}
+  .attach .fico{width:26px;height:32px;border-radius:4px;background:var(--primary);color:#00202D;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:900;flex:none}
+  .attach .fn{font-size:12.5px;font-weight:700;color:var(--text)}
+  .attach .fs{font-size:11px;color:var(--muted)}
+
+  .qr{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .qrchip{border:1.5px solid var(--ocean70);background:transparent;color:var(--primary);border-radius:24px;padding:8px 15px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .12s}
+  .qrchip:hover{background:rgba(51,201,255,.10)}
+
+  .typing{display:flex;gap:4px;padding:4px 2px}
+  .typing span{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:tb 1s infinite ease-in-out}
+  .typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+  @keyframes tb{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+  .composer{position:sticky;bottom:14px;margin-top:6px;display:flex;align-items:center;gap:10px;background:var(--surf);border:1px solid var(--line);border-radius:26px;padding:7px 8px 7px 8px;box-shadow:0 6px 20px rgba(0,10,20,.3)}
+  .composer .iconbtn{width:38px;height:38px;border-radius:50%;border:none;background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+  .composer .iconbtn:hover{color:var(--text);background:rgba(137,242,247,.08)}
+  .composer input{flex:1;border:none;background:transparent;color:var(--text);font-size:14.5px;font-family:inherit;outline:none;padding:6px 4px}
+  .composer input::placeholder{color:#5C7E90}
+  .composer .send{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#00202D;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+  .composer .send:hover{background:var(--primary90)}
+
+  /* right rail */
+  .rail{position:sticky;top:22px;padding:20px}
+  .rail h3{font-size:13px;font-weight:900;color:#fff;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+  .rail .subttl{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.45}
+  .rgroup{margin-bottom:15px}
+  .rgroup .glabel{font-size:10.5px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:7px}
+  .rchips{display:flex;flex-wrap:wrap;gap:6px}
+  .rchip{font-size:12px;font-weight:700;background:var(--cer10);color:#002E40;border-radius:20px;padding:4px 11px}
+  .rchip.ghost{background:transparent;border:1px solid var(--ocean70);color:var(--sub)}
+  .rail .prog{margin-top:6px;font-size:11.5px;color:var(--muted)}
+
+  @media(max-width:860px){.stage{grid-template-columns:1fr}.rail{position:static}.bwrap{max-width:88%}}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<header class="topbar">
+  <a class="brand" href="hub.html">
+    <img class="studio-logo" src="Studio-logo-white.svg" alt="iDesign Studio">
+    
+  </a>
+  <span class="spacer"></span>
+  <span class="ctx"><b>Concierge</b><span class="sep">·</span>Business Analytics (new)</span>
+  <span class="linklike" style="margin-left:14px" onclick="location.href='hub.html'">← All tools</span>
+</header>
+
+<div class="stage">
+  <!-- chat column -->
+  <div class="chatcol">
+    <div class="thread">
+
+      <div class="msg">
+        <div class="av agent">__MARK__</div>
+        <div class="bwrap"><div class="who">Studio Concierge</div>
+          <div class="bubble agent">Welcome back, Dr. Kilgore. What are you working on today?</div>
+        </div>
+      </div>
+
+      <div class="msg me">
+        <div class="av me">K</div>
+        <div class="bwrap"><div class="who" style="color:var(--primary)">Dr. Kilgore</div>
+          <div class="bubble me">I need to build out a new undergraduate <b>Business Analytics</b> course. It's part of the MBA program we started last semester.</div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av agent">__MARK__</div>
+        <div class="bwrap"><div class="who">Studio Concierge</div>
+          <div class="bubble agent">Got it — I found the <b>MBA program</b> (partner: <b>Kelley School</b>). It has <b>4 PLOs</b> and maps to <b>AACSB</b> standards.<br><br>A few things I need to know:
+            <ol>
+              <li>How many weeks / modules?</li>
+              <li>Fully online, hybrid, or face-to-face?</li>
+              <li>Any existing syllabus I can start from?</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg me">
+        <div class="av me">K</div>
+        <div class="bwrap"><div class="who" style="color:var(--primary)">Dr. Kilgore</div>
+          <div class="bubble me">8 weeks, fully online. Here's the syllabus.
+            <div class="attach"><span class="fico">PDF</span><span><span class="fn">Business-Analytics-Syllabus.pdf</span><br><span class="fs">248 KB</span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg">
+        <div class="av agent">__MARK__</div>
+        <div class="bwrap"><div class="who">Studio Concierge</div>
+          <div class="bubble agent">Reading it now… I pulled <b>8 topic areas</b>, a <b>midterm project</b>, and <b>6 course learning outcomes</b> from the syllabus. They already align cleanly to 3 of the program's 4 PLOs.<br><br>Want me to:
+            <div class="qr">
+              <button class="qrchip" onclick="pick(this)">Map topics → CLOs</button>
+              <button class="qrchip" onclick="pick(this)">Draft the 8-week outline</button>
+              <button class="qrchip" onclick="pick(this)">Check AACSB alignment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /thread -->
+
+    <div class="composer">
+      <button class="iconbtn" title="Attach"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5l-8.5 8.5a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.6 1.6 0 0 1-2.3-2.3l7.8-7.8"/></svg></button>
+      <input type="text" placeholder="Message Concierge…" aria-label="Message Concierge">
+      <button class="send" title="Send"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+
+  <!-- right rail -->
+  <aside class="card rail">
+    <h3>What Concierge has gathered</h3>
+    <div class="subttl">Pulled from your programs, standards, and the syllabus you shared.</div>
+
+    <div class="rgroup"><div class="glabel">Program</div><div class="rchips"><span class="rchip">MBA · Kelley School</span></div></div>
+    <div class="rgroup"><div class="glabel">Alignment</div><div class="rchips"><span class="rchip">4 PLOs</span><span class="rchip">AACSB</span></div></div>
+    <div class="rgroup"><div class="glabel">Format</div><div class="rchips"><span class="rchip">8 weeks</span><span class="rchip">Fully online</span></div></div>
+    <div class="rgroup"><div class="glabel">Source</div><div class="rchips"><span class="rchip ghost">Business-Analytics-Syllabus.pdf</span></div></div>
+    <div class="rgroup"><div class="glabel">Extracted</div><div class="rchips"><span class="rchip">8 topics</span><span class="rchip">Midterm project</span><span class="rchip">6 CLOs</span></div></div>
+
+    <div class="prog">Alignment intake · <b style="color:var(--sub)">70% complete</b></div>
+  </aside>
+</div>
+
+<script>
+  var MARK='<svg viewBox="0 0 122 158" aria-hidden="true"><path fill="#fff" d="M110.96,100.39c-2.26-4.83-5.23-8.91-8.93-12.26-3.7-3.34-7.92-6.11-12.66-8.29-4.75-2.18-9.59-4.12-14.53-5.83s-9.79-3.33-14.53-4.84c-4.75-1.52-8.97-3.29-12.66-5.31-3.7-2.02-6.67-4.45-8.93-7.29s-3.38-6.4-3.38-10.68c0-3.35.6-6.44,1.81-9.28,1.21-2.84,3.02-5.31,5.43-7.41,2.41-2.1,5.39-3.73,8.93-4.9s7.65-1.75,12.31-1.75c5.06,0,9.41.64,13.07,1.92s6.83,2.68,9.51,4.2c2.68,1.51,4.94,2.9,6.77,4.14s3.48,1.87,4.96,1.87c1.4,0,2.57-.33,3.5-.99s1.83-1.7,2.68-3.1l6.65-13.07c-5.83-5.6-12.78-9.92-20.83-12.96C82.08,1.53,73.23,0,63.58,0c-8.56,0-16.19,1.33-22.87,3.97-6.69,2.65-12.31,6.17-16.87,10.56-4.55,4.4-8.01,9.44-10.39,15.12-2.37,5.68-3.56,11.55-3.56,17.62,0,7.63,1.13,13.99,3.39,19.08,2.26,5.1,5.23,9.37,8.93,12.843.69,3.46,7.92,6.26,12.66,8.41,4.74,2.14,9.57,4.01,14.47,5.6,4.9,1.6,9.73,3.1,14.47,4.494.74,1.4,8.97,3.12,12.66,5.14s6.67,4.53,8.93,7.53,3.38,6.87,3.38,11.61c0,8.48-2.7,15.14-8.11,19.96-5.2,4.64-12.11,6.59-18.93,7.09-7.68.56-16.01-.11-22.87,4.07-2.21,1.35-4.12,3.13-5.87,5.04-1.79,1.94-3.9,4.22-4.79,6.75-.11.32-.2.66-.1.98.15.44.64.66,1.07.83,8.87,3.38,18.36,5.13,27.85,5.13s17.22-1.4,24.34-4.2c7.12-2.8,13.11-6.63,17.97-11.49s8.58-10.56,11.15-17.1c2.57-6.54,3.85-13.54,3.85-21.010-6.92-1.13-12.8-3.39-17.62h0Z"/><circle cx="14.77" cy="142.95" r="14.77" fill="#fff"/></svg>';
+  var thread=document.querySelector('.thread');
+  var input=document.querySelector('.composer input');
+
+  // hydrate the static agent avatars
+  document.querySelectorAll('.av.agent').forEach(function(node){ node.innerHTML=MARK; });
+  // wire the static quick-reply chips
+  document.querySelectorAll('.qrchip').forEach(function(b){ b.onclick=function(){ qrSend(b); }; });
+
+  function mk(tag,cls,html){ var e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; }
+  function scrollDown(){ window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'}); }
+
+  function appendUser(text){
+    var msg=mk('div','msg me');
+    var av=mk('div','av me'); av.textContent='K'; msg.appendChild(av);
+    var w=mk('div','bwrap');
+    w.appendChild(mk('div','who','Dr. Kilgore'));
+    var b=mk('div','bubble me'); b.textContent=text; w.appendChild(b);
+    msg.appendChild(w); thread.appendChild(msg); scrollDown();
+  }
+  function appendAgent(resp){
+    var msg=mk('div','msg');
+    var av=mk('div','av agent',MARK); msg.appendChild(av);
+    var w=mk('div','bwrap');
+    w.appendChild(mk('div','who','Studio Concierge'));
+    var b=mk('div','bubble agent',resp.html);
+    if(resp.chips && resp.chips.length){
+      var qr=mk('div','qr');
+      resp.chips.forEach(function(c){ var btn=mk('button','qrchip',null); btn.type='button'; btn.textContent=c; btn.onclick=function(){ qrSend(btn); }; qr.appendChild(btn); });
+      b.appendChild(qr);
+    }
+    w.appendChild(b); msg.appendChild(w); thread.appendChild(msg); scrollDown();
+  }
+  function showTyping(){
+    var msg=mk('div','msg'); msg.setAttribute('data-typing','1');
+    var av=mk('div','av agent',MARK); msg.appendChild(av);
+    var w=mk('div','bwrap');
+    w.appendChild(mk('div','who','Studio Concierge'));
+    w.appendChild(mk('div','bubble agent','<div class="typing"><span></span><span></span><span></span></div>'));
+    msg.appendChild(w); thread.appendChild(msg); scrollDown();
+    return msg;
+  }
+
+  function responseFor(text){
+    var t=text.toLowerCase();
+    if(t.indexOf('map')>-1 && t.indexOf('clo')>-1) return {html:'Done — I mapped all <b>8 topics</b> to the <b>6 CLOs</b>. Topics 3 and 7 both reinforce CLO&nbsp;4 (data storytelling), and two topics don’t hit a CLO yet.<br><br>Want me to propose outcomes for the two gaps, or fold them into existing modules?', chips:['Propose outcomes','Fold into modules']};
+    if(t.indexOf('outline')>-1 || t.indexOf('draft')>-1) return {html:'Here’s a first pass: <b>8 modules</b>, one topic each, with the <b>midterm project in Week&nbsp;5</b>. Every module has a reading, a lecture video, and one interactive.<br><br>Want me to hand the videos to <b>Script</b>, or build the activities in <b>Interactives</b>?', chips:['Open in Script','Open in Interactives']};
+    if(t.indexOf('aacsb')>-1 || t.indexOf('align')>-1) return {html:'All <b>6 CLOs</b> map to AACSB standards — Analytical Thinking, Information Technology, and Communication are well covered. <b>Standard&nbsp;5 (Data&nbsp;Analytics)</b> is only lightly touched in Week&nbsp;2.<br><br>Want me to strengthen Week&nbsp;2, or flag it for the program lead?', chips:['Strengthen Week 2','Flag for lead']};
+    if(t.indexOf('script')>-1) return {html:'Opening <b>Script</b> with the 8-module outline pre-loaded — each lecture gets a script stub tied to its CLO. This is where Concierge hands off to the Script tool.', chips:[]};
+    if(t.indexOf('interactive')>-1) return {html:'Opening <b>Interactives</b> — I’ll suggest an activity per module: drag-and-drop for the data-cleaning topic, a branching scenario for the ethics case, flashcards for key terms.', chips:[]};
+    if(t.indexOf('outcome')>-1) return {html:'Drafted two new outcomes for the gap topics and slotted them under PLO&nbsp;4. You can refine the wording anytime.', chips:['Draft the 8-week outline']};
+    return {html:'Got it — noted, and I’ll factor that into the build. Want me to draft the <b>8-week outline</b> next, or keep gathering?', chips:['Draft the 8-week outline','Keep gathering']};
+  }
+
+  function send(text){
+    text=(text||'').trim(); if(!text) return;
+    appendUser(text);
+    var typing=showTyping();
+    setTimeout(function(){ typing.remove(); appendAgent(responseFor(text)); }, 950);
+  }
+  function qrSend(btn){ var row=btn.parentNode; if(row) row.remove(); send(btn.textContent); }
+  function pick(btn){ qrSend(btn); }   // back-compat for any inline handlers
+
+  document.querySelector('.composer .send').onclick=function(){ send(input.value); input.value=''; };
+  input.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); send(input.value); input.value=''; } });
+</script>
+</body>
+</html>
