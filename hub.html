@@ -38,14 +38,13 @@
   .tool.soon .tool-open{margin-top:16px;color:var(--muted);font-weight:700;font-size:12.5px}
 
   /* demo toggle */
-  .demo-toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
-  .demo-toggle input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+  .demo-toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;background:none;border:none;padding:0;font-family:inherit}
   .demo-toggle .track{width:38px;height:22px;border-radius:20px;background:var(--line);position:relative;transition:background .15s;flex:none}
   .demo-toggle .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s}
-  .demo-toggle input:checked + .track{background:var(--primary)}
-  .demo-toggle input:checked + .track .knob{transform:translateX(16px)}
+  .demo-toggle[aria-checked="true"] .track{background:var(--primary)}
+  .demo-toggle[aria-checked="true"] .knob{transform:translateX(16px)}
   .demo-toggle .dt-label{font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
-  .demo-toggle input:checked ~ .dt-label{color:var(--text)}
+  .demo-toggle[aria-checked="true"] .dt-label{color:var(--text)}
 
   /* demo view hides internal-only tools */
   body.demo [data-group="internal"]{display:none}
@@ -64,11 +63,10 @@
     <img class="studio-logo" src="Studio-logo-white.svg" alt="iDesign Studio">
   </a>
   <span class="spacer"></span>
-  <label class="demo-toggle" title="Demo view hides internal-only tools — shows only what partners see">
-    <input type="checkbox" id="demoToggle">
+  <button type="button" class="demo-toggle" id="demoToggle" role="switch" aria-checked="false" title="Demo view hides internal-only tools — shows only what partners see">
     <span class="track"><span class="knob"></span></span>
     <span class="dt-label">Demo view</span>
-  </label>
+  </button>
   <span class="userchip"><span class="av">K</span>Dr. Kilgore</span>
   <span class="linklike" onclick="location.href='login.html'">Sign out</span>
 </header>
@@ -209,7 +207,11 @@
 
 <script>
   var dt=document.getElementById('demoToggle');
-  dt.addEventListener('change',function(){ document.body.classList.toggle('demo', dt.checked); });
+  dt.addEventListener('click',function(){
+    var on=dt.getAttribute('aria-checked')==='true';
+    dt.setAttribute('aria-checked', String(!on));
+    document.body.classList.toggle('demo', !on);
+  });
 </script>
 </body>
 </html>
